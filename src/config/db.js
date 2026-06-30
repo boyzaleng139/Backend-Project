@@ -14,11 +14,14 @@ if (!process.env.DATABASE_URL) {
  * Shared connection pool — import { pool } wherever a query is needed.
  * Never instantiate a second Pool in another module.
  */
+const isProduction = process.env.NODE_ENV === 'production'
+
 const pool = new Pool({
   connectionString:        process.env.DATABASE_URL,
   max:                     10,
   idleTimeoutMillis:       30000,
-  connectionTimeoutMillis: 5000,   // 5s — allows for slow local PG startup
+  connectionTimeoutMillis: 5000,
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
 })
 
 // Log pool-level errors without crashing (prevents unhandled rejection)
