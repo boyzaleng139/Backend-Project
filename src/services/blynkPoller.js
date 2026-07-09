@@ -14,6 +14,7 @@ try {
 
 const SensorLog     = require('../models/SensorLog')
 const socketService = require('./socketService')
+const { checkAndNotify } = require('./lineNotify')
 
 const TOKEN       = process.env.BLYNK_AUTH_TOKEN
 const BASE_URL    = process.env.BLYNK_BASE_URL || 'https://blynk.cloud/external/api'
@@ -85,6 +86,7 @@ async function runPollCycle() {
     const temp  = await fetchTemp()
     const saved = await SensorLog.insert(temp)
     socketService.emit('sensor_update', saved)
+    checkAndNotify(temp)
 
     pollCount++
     errorCount = 0   // reset streak on success
